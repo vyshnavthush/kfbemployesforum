@@ -41,10 +41,12 @@
   </form>
 
   <div id="resultArea" class="results" aria-live="polite" tabindex="-1"></div>
+
   <p class="sr-only" id="ariaAnnounce"></p>
 </main>
 
 <script>
+/* --- Questions derived from uploaded MOP (mop.pdf) --- */
 const quizData = [
 { q: "What is 'tappal' as defined in MOP?", choices:["All communications received in the office before registration", "Only telegrams", "Outgoing mail", "Old files kept for reference"], correct:"All communications received in the office before registration" },
 { q: "What is called a 'current' in MOP?", choices:["A registered communication distributed to sections with date seal and number", "An old disposal file", "A draft only", "An enclosure attached to a letter"], correct:"A registered communication distributed to sections with date seal and number" },
@@ -68,6 +70,7 @@ const quizData = [
 { q: "What is the primary role of the Records Section?", choices:["Arranging and keeping old records for future reference and quick retrieval", "Drafting letters", "Issuing reminders", "Typing drafts only"], correct:"Arranging and keeping old records for future reference and quick retrieval" }
 ];
 
+/* --- Render quiz with accessible markup and shuffled questions --- */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function renderQuiz(){
   const cont = document.getElementById('questions');
@@ -93,13 +96,16 @@ function renderQuiz(){
   });
 }
 
+const aria = document.getElementById('ariaAnnounce');
+
+/* --- Submit and show results --- */
 function submitQuiz(){
   document.getElementById('submitBtn').disabled = true;
   const secs = Array.from(document.querySelectorAll('.question'));
   let score = 0;
   let out = '<h2>Results</h2><ol>';
   secs.forEach((s, i) => {
-    const qText = s.querySelector('legend').textContent.replace(/^Question \d+:\s*/,'');
+    const qText = s.querySelector('legend').textContent.replace(/^Question \d+:\s*/, '');
     const ans = s.querySelector('input[type=radio]:checked');
     const chosen = ans ? ans.value : null;
     const correct = s.dataset.correct;
@@ -111,7 +117,7 @@ function submitQuiz(){
   });
   out += `</ol><p><strong>Score:</strong> ${score} of ${secs.length}.</p>`;
   document.getElementById('resultArea').innerHTML = out;
-  document.getElementById('ariaAnnounce').textContent = `Quiz completed. Score ${score} out of ${secs.length}.`;
+  aria.textContent = `Quiz completed. Score ${score} out of ${secs.length}.`;
   document.getElementById('resultArea').focus();
 }
 
@@ -125,9 +131,10 @@ document.getElementById('resetBtn').addEventListener('click', function(){
     document.getElementById('submitBtn').disabled = false;
     document.getElementById('resultArea').innerHTML = '';
     renderQuiz();
-    document.getElementById('ariaAnnounce').textContent = 'Quiz reset.';
+    aria.textContent = 'Quiz reset.';
   }
 });
+
 document.getElementById('downloadBtn').addEventListener('click', function(){
   const content = '<!doctype html>\n' + document.documentElement.outerHTML;
   const blob = new Blob([content], {type:'text/html;charset=utf-8'});
@@ -138,6 +145,7 @@ document.getElementById('downloadBtn').addEventListener('click', function(){
   setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
 });
 
+/* Init */
 renderQuiz();
 </script>
 </body>
