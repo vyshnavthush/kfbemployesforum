@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Manual of Office Procedure — 20 Question Quiz (20 min)</title>
+<title>Manual of Office Procedure — 20 Question Quiz</title>
 <ul>
 <li>
 <a href="mop.html" aria-label="Go Back">Go Back</a>
@@ -16,7 +16,6 @@
   fieldset{ border:0; padding:0; margin:0;}
   .submit-row{ margin-top:1rem; display:flex; gap:0.6rem; }
   button{ padding:0.6rem 1rem; font-size:1rem; border-radius:6px; cursor:pointer; }
-  .timer { font-weight:700; margin-bottom:1rem; }
   .results { margin-top:1rem; padding:1rem; border-radius:8px; background:#f7f7f7; }
   .correct { color: #0a7; font-weight:700; }
   .wrong { color: #d33; font-weight:700; }
@@ -29,12 +28,10 @@
 <body>
 <main>
   <h1>Manual of Office Procedure — 20 Question MCQ</h1>
-  <p>Time allowed: <strong>20 minutes</strong>. When time ends the quiz auto-submits. Results will show the correct answers in words/phrases (not letters).</p>
-
-  <div id="timer" class="timer" role="status" aria-live="polite">Time remaining: 20:00</div>
+  <p>Answer the questions below and click "Submit answers" to see your results.</p>
 
   <form id="quizForm" aria-labelledby="quizTitle" novalidate>
-    <div id="questions" ></div>
+    <div id="questions"></div>
 
     <div class="submit-row">
       <button type="submit" id="submitBtn">Submit answers</button>
@@ -44,70 +41,43 @@
   </form>
 
   <div id="resultArea" class="results" aria-live="polite" tabindex="-1"></div>
-
   <p class="sr-only" id="ariaAnnounce"></p>
-  <p style="margin-top:1rem; font-size:0.9rem; color:#444;">
-    Source: Manual of Office Procedure (MOP) — quiz questions created from your uploaded file. :contentReference[oaicite:1]{index=1}
-  </p>
 </main>
 
 <script>
-/* --- Questions derived from uploaded MOP (mop.pdf) --- */
-/* Each question: text, choices array, correct (word/phrase) */
 const quizData = [
 { q: "What is 'tappal' as defined in MOP?", choices:["All communications received in the office before registration", "Only telegrams", "Outgoing mail", "Old files kept for reference"], correct:"All communications received in the office before registration" },
-
 { q: "What is called a 'current' in MOP?", choices:["A registered communication distributed to sections with date seal and number", "An old disposal file", "A draft only", "An enclosure attached to a letter"], correct:"A registered communication distributed to sections with date seal and number" },
-
 { q: "What does a 'case' consist of according to MOP?", choices:["Current file, note file and previous papers/books put up for reference", "Only drafts", "Only disposals", "Only enclosures"], correct:"Current file, note file and previous papers/books put up for reference" },
-
 { q: "Which file contains notes written by clerks to facilitate disposal?", choices:["Note file", "Current file", "Back file", "Stock file"], correct:"Note file" },
-
 { q: "What is 'disposal' in office procedure?", choices:["Statement of final decision of head of office on any case", "A draft letter", "An endorsement", "A reminder diary entry"], correct:"Statement of final decision of head of office on any case" },
-
 { q: "What are 'back files'?", choices:["Disposals containing decisions already taken put up for reference", "Files to be destroyed immediately", "Unregistered papers", "Telegram records"], correct:"Disposals containing decisions already taken put up for reference" },
-
 { q: "What is 'flagging'?", choices:["Attaching slips with alphabetical letters to top of papers for reference", "Punching holes in papers", "Registering a paper", "Typing drafts"], correct:"Attaching slips with alphabetical letters to top of papers for reference" },
-
 { q: "What does 'linking of files' mean?", choices:["Submitting together two related files so both are seen together", "Destroying old files", "Indexing entries", "Registering tappal"], correct:"Submitting together two related files so both are seen together" },
-
 { q: "Which register is used to enter currents in order of current number?", choices:["Personal Register (PR)", "Distribution Register", "Reminder Diary", "Stock File"], correct:"Personal Register (PR)" },
-
 { q: "Which item generally need NOT be entered in the Distribution Register (DR)?", choices:["Telegraphic messages, gazettes, unstamped petitions", "All official letters", "Registered currents", "Disposals"], correct:"Telegraphic messages, gazettes, unstamped petitions" },
-
 { q: "How should drafts be prepared according to MOP?", choices:["Complete, brief and typed if long, leaving space for corrections", "Always handwritten with no margins", "Include as many enclosures as possible", "Be vague and informal"], correct:"Complete, brief and typed if long, leaving space for corrections" },
-
 { q: "Which form is used for correspondence with Government or higher authorities?", choices:["Letter Form", "Memorandum Form", "Endorsement Form", "Demi-Official Form"], correct:"Letter Form" },
-
 { q: "Which form is used to record important decisions exercised under statutory power?", choices:["Proceedings Form", "Letter Form", "UO Note", "Circular Form"], correct:"Proceedings Form" },
-
 { q: "What is a 'DO Letter' (Demi-Official)?", choices:["Personal correspondence between officers without full official formality", "Official circular", "A register entry", "A disposal type"], correct:"Personal correspondence between officers without full official formality" },
-
 { q: "How long should a 'D Disposal' be kept before destruction as per MOP?", choices:["10 years", "1 year", "3 years", "Permanently"], correct:"10 years" },
-
 { q: "What is the main purpose of indexing in MOP?", choices:["To trace papers containing orders passed on a particular subject", "To destroy old files", "To sort tappal only", "To draft letters automatically"], correct:"To trace papers containing orders passed on a particular subject" },
-
 { q: "What is the 'Reminder Diary' used for?", choices:["To remind initiation of further action in any file on a specified future date", "Recording stock files", "Registering incoming tappal", "Indexing disposals"], correct:"To remind initiation of further action in any file on a specified future date" },
-
 { q: "What are 'lie over cases'?", choices:["Cases ordered to be kept in abeyance for a definite short period", "Files to be destroyed", "Files without any action ever", "Only telegrams"], correct:"Cases ordered to be kept in abeyance for a definite short period" },
-
 { q: "Where should note file be placed relative to the current file while submitting to officers?", choices:["Note file above the current file", "Current file above the note file", "They should be merged", "Note file is kept separately off-site"], correct:"Note file above the current file" },
-
 { q: "What is the primary role of the Records Section?", choices:["Arranging and keeping old records for future reference and quick retrieval", "Drafting letters", "Issuing reminders", "Typing drafts only"], correct:"Arranging and keeping old records for future reference and quick retrieval" }
 ];
 
-/* --- Render quiz with accessible markup and shuffled questions --- */
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function renderQuiz(){
   const cont = document.getElementById('questions');
   cont.innerHTML = '';
-  const data = shuffle(JSON.parse(JSON.stringify(quizData))); // clone + shuffle
+  const data = shuffle(JSON.parse(JSON.stringify(quizData)));
   data.forEach((item, idx) => {
     const qid = 'q'+idx;
     const sec = document.createElement('section');
     sec.className = 'question';
     sec.dataset.correct = item.correct;
-    // shuffle choices
     const choices = shuffle(item.choices.slice());
     sec.innerHTML = `<fieldset aria-labelledby="${qid}-label">
       <legend id="${qid}-label"><strong>Question ${idx+1}:</strong> ${item.q}</legend>
@@ -123,38 +93,13 @@ function renderQuiz(){
   });
 }
 
-/* --- Timer (20 minutes) --- */
-let secondsLeft = 20 * 60;
-let timerInterval = null;
-const timerEl = document.getElementById('timer');
-const aria = document.getElementById('ariaAnnounce');
-
-function startTimer(){
-  clearInterval(timerInterval);
-  timerInterval = setInterval(()=>{
-    secondsLeft--;
-    const mm = String(Math.floor(secondsLeft/60)).padStart(2,'0');
-    const ss = String(secondsLeft%60).padStart(2,'0');
-    timerEl.textContent = `Time remaining: ${mm}:${ss}`;
-    if(secondsLeft === 60) aria.textContent = 'One minute remaining.';
-    if(secondsLeft === 30) aria.textContent = 'Thirty seconds remaining.';
-    if(secondsLeft <= 0){
-      clearInterval(timerInterval);
-      aria.textContent = 'Time is up. Auto-submitting quiz.';
-      setTimeout(()=> submitQuiz(true), 400);
-    }
-  },1000);
-}
-
-/* --- Submit and show results (answers shown as words/phrases) --- */
-function submitQuiz(auto=false){
+function submitQuiz(){
   document.getElementById('submitBtn').disabled = true;
-  clearInterval(timerInterval);
   const secs = Array.from(document.querySelectorAll('.question'));
   let score = 0;
   let out = '<h2>Results</h2><ol>';
   secs.forEach((s, i) => {
-    const qText = s.querySelector('legend').textContent.replace(/^Question \\d+:\\s*/,'');
+    const qText = s.querySelector('legend').textContent.replace(/^Question \d+:\s*/,'');
     const ans = s.querySelector('input[type=radio]:checked');
     const chosen = ans ? ans.value : null;
     const correct = s.dataset.correct;
@@ -166,29 +111,25 @@ function submitQuiz(auto=false){
   });
   out += `</ol><p><strong>Score:</strong> ${score} of ${secs.length}.</p>`;
   document.getElementById('resultArea').innerHTML = out;
-  aria.textContent = `Quiz completed. Score ${score} out of ${secs.length}.`;
+  document.getElementById('ariaAnnounce').textContent = `Quiz completed. Score ${score} out of ${secs.length}.`;
   document.getElementById('resultArea').focus();
 }
 
-/* --- Helpers & Controls --- */
 function escapeHtml(s){ return s ? s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;') : ''; }
 
 document.getElementById('quizForm').addEventListener('submit', function(e){
-  e.preventDefault(); submitQuiz(false);
+  e.preventDefault(); submitQuiz();
 });
 document.getElementById('resetBtn').addEventListener('click', function(){
-  if(confirm('Reset quiz and restart 20 minute timer?')){
+  if(confirm('Reset quiz?')){
     document.getElementById('submitBtn').disabled = false;
     document.getElementById('resultArea').innerHTML = '';
-    secondsLeft = 20*60;
-    renderQuiz(); startTimer();
-    aria.textContent = 'Quiz reset and timer restarted.';
+    renderQuiz();
+    document.getElementById('ariaAnnounce').textContent = 'Quiz reset.';
   }
 });
-
-/* Download current HTML file (self-contained) */
 document.getElementById('downloadBtn').addEventListener('click', function(){
-  const content = '<!doctype html>\\n' + document.documentElement.outerHTML;
+  const content = '<!doctype html>\n' + document.documentElement.outerHTML;
   const blob = new Blob([content], {type:'text/html;charset=utf-8'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -197,9 +138,7 @@ document.getElementById('downloadBtn').addEventListener('click', function(){
   setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 500);
 });
 
-/* Init */
 renderQuiz();
-startTimer();
 </script>
 </body>
 </html>
