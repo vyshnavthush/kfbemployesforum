@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ഓഫീസ് പ്രൊസീജർ മാനുവൽ — 20 ചോദ്യങ്ങൾ</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial;max-width:900px;margin:1rem auto;padding:1rem}
+    header,footer{padding:1rem;background:#f3f4f6;border-radius:8px}
+    fieldset{margin:1rem 0;padding:1rem;border-radius:6px}
+    .negative{outline:3px dashed #fca5a5;padding:0.5rem;border-radius:6px}
+    .announce{margin-top:.5rem;font-style:italic}
+    .correct{color:green;font-weight:600}
+    .incorrect{color:red;font-weight:600}
+    .answers-list{margin-top:1rem;background:#fff;padding:.8rem;border-radius:6px}
+    button{padding:.6rem 1rem;border-radius:6px;border:0;background:#2563eb;color:white}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ഓഫീസ് പ്രൊസീജർ മാനുവൽ — 20 ചോദ്യം എംസിക്യു</h1>
+    <p>മുമ്പത്തെ വർഷത്തെ ചോദ്യങ്ങൾ അടിസ്ഥാനമാക്കി തയ്യാറാക്കിയ എംസിക്യു. ഓരോ ചോദ്യത്തിനും ഉത്തരം തിരഞ്ഞെടുത്താൽ അതിന്റെ ശരിയോ തെറ്റോ സ്ക്രീൻ റീഡറിൽ പ്രഖ്യാപിക്കും. മൂന്ന് ചോദ്യങ്ങൾക്ക് <strong>നെഗറ്റീവ് മാർക്ക്</strong> ഉണ്ടായിരിക്കും (പേജ് തുറന്നപ്പോൾ റാൻഡം ആയി തിരഞ്ഞെടുക്കപ്പെടും).</p>
+    <div id="negInfo" aria-live="polite"></div>
+  </header>
+
+  <main>
+    <form id="quizForm"></form>
+
+    <div style="display:flex;gap:1rem;margin-top:1rem;">
+      <button id="submitBtn" type="button">ഉത്തരം സമർപ്പിക്കുക</button>
+      <button id="downloadBtn" type="button">ഈ പേജ് ഡൗൺലോഡ് ചെയ്യുക (HTML)</button>
+      <button id="resetBtn" type="button">റീസെറ്റ് ചെയ്യുക</button>
+    </div>
+
+    <div id="result" role="status" aria-live="polite" style="margin-top:1rem"></div>
+
+    <section id="allAnswers" class="answers-list" aria-live="polite" hidden>
+      <h2>ശരിയായ ഉത്തരങ്ങൾ</h2>
+      <ol id="answersList"></ol>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>തയ്യാറാക്കി പ്രസിദ്ധീകരിച്ചത്: മുൻവർഷ ചോദ്യങ്ങൾ — ഓഫീസ്സ് പ്രൊസീജർ മാനുവൽ</p>
+  </footer>
+
+  <script>
+  const questions = [
+    {q: 'ഓഫീസ് പ്രൊസീജറിൽ “തപാൽ” എന്നത് എന്താണ്?',
+     opts: ['ഓഫീസിലേക്ക് വരുന്ന അറിയിപ്പുകൾ','പുറത്തേക്കുള്ള കത്തുകൾ മാത്രം','ഒരു ഫയൽ കവറിന്റെ മാതൃക','ഡിസ്ട്രിബ്യൂഷൻ രജിസ്റ്റർ'],
+     answer: 'ഓഫീസിലേക്ക് വരുന്ന അറിയിപ്പുകൾ'},
+    {q: 'അഞ്ചോ അതിലധികമോ ടൈപ്പിസ്റ്റ് ഉള്ള ഓഫീസിലെ ടൈപ്പിംഗ് നിയന്ത്രിക്കുന്നത് ആരാണ്?',
+     opts: ['ഫെയർ കോപ്പി സൂപ്രണ്ട്','സെക്ഷൻ ക്ലാർക്ക്','റെക്കോർഡ് കീപ്പർ','ഓഫീസ് മാനേജർ'],
+     answer: 'ഫെയർ കോപ്പി സൂപ്രണ്ട്'},
+    {q: 'ലഭിക്കുന്ന കത്തുകൾക്ക് നമ്പർ നൽകുന്ന ആദ്യഘട്ടം ഏത്?',
+     opts: ['തീയതിയും മുദ്രയും പതിക്കുക','ടൈറ്റിൽ എഴുതുക','സൂപ്രണ്ടിന് കൈമാറുക','തപാൽ ബോക്സിൽ ഇടുക'],
+     answer: 'തീയതിയും മുദ്രയും പതിക്കുക'},
+    {q: 'ഡിസ്ട്രിബ്യൂഷൻ രജിസ്റ്ററിൽ രേഖപ്പെടുത്തുന്നത് എന്താണ്?',
+     opts: ['ഓഫീസിനുള്ളിൽ പേപ്പർ അയച്ച വിഭാഗം','ഡിസ്പോസൽ തരം മാത്രം','പുറത്തേക്ക് അയച്ച കത്തുകൾ','സ്റ്റാഫ് ഹാജർ'],
+     answer: 'ഓഫീസിനുള്ളിൽ പേപ്പർ അയച്ച വിഭാഗം'},
+    {q: 'R ഡിസ്പോസൽ എന്ത് സൂചിപ്പിക്കുന്നു?',
+     opts: ['സ്ഥിരമായി സൂക്ഷിക്കുക','ഉടൻ നശിപ്പിക്കുക','മൂന്ന് വർഷം സൂക്ഷിക്കുക','ഫയൽ ചെയ്ത് അടയ്ക്കുക'],
+     answer: 'സ്ഥിരമായി സൂക്ഷിക്കുക'},
+    {q: 'D ഡിസ്പോസൽ എന്താണ്?',
+     opts: ['നിശ്ചിതകാലം കഴിഞ്ഞ് നശിപ്പിക്കുക','മറ്റൊരു ഓഫീസിലേക്ക് കൈമാറുക','തീരുമാനം മാറ്റിവയ്ക്കുക','സ്ഥിരമായി സൂക്ഷിക്കുക'],
+     answer: 'നിശ്ചിതകാലം കഴിഞ്ഞ് നശിപ്പിക്കുക'},
+    {q: 'ഒരു ഓഫീസിനുള്ളിൽ സെക്ഷനുകൾ തമ്മിൽ ആശയവിനിമയം നടത്താൻ ഉപയോഗിക്കുന്ന ഫോം?',
+     opts: ['മെമ്മോറാണ്ടം ഫോം','ലെറ്റർ ഫോം','എൻഡോഴ്സ്മെന്റ് ഫോം','ഡെമി-ഓഫീഷ്യൽ ഫോം'],
+     answer: 'മെമ്മോറാണ്ടം ഫോം'},
+    {q: '"കറന്റ് ഫയൽ" എന്നാണ്?',
+     opts: ['നടന്നുകൊണ്ടിരിക്കുന്ന ജോലിക്കായി ഉപയോഗിക്കുന്ന ഫയൽ','ആർക്കൈവ് ഫയൽ','റെജിസ്റ്റർ പുസ്തകം','റെക്കോർഡ് കീപ്പറുടെ ലെഡ്ജർ'],
+     answer: 'നടന്നുകൊണ്ടിരിക്കുന്ന ജോലിക്കായി ഉപയോഗിക്കുന്ന ഫയൽ'},
+    {q: 'നോട്ടിങ്ങിന്റെ ഉദ്ദേശ്യം എന്താണ്?',
+     opts: ['ഡിസ്പോസൽ നടപടി എളുപ്പമാക്കുക','കത്തുകളുടെ പകർപ്പ് എടുക്കുക','പുറത്തുനിന്നുള്ള കത്തുകൾ സൂക്ഷിക്കുക','സ്റ്റാഫ് ഡ്യൂട്ടി ക്രമീകരിക്കുക'],
+     answer: 'ഡിസ്പോസൽ നടപടി എളുപ്പമാക്കുക'},
+    {q: 'പേഴ്സണൽ രജിസ്റ്ററിൽ എത്ര കോളങ്ങൾ ഉണ്ട്?',
+     opts: ['10 കോളങ്ങൾ','5 കോളങ്ങൾ','3 കോളങ്ങൾ','12 കോളങ്ങൾ'],
+     answer: '10 കോളങ്ങൾ'},
+    {q: 'ഡ്രാഫ്റ്റിൽ വളരെ തിരുത്തലുകൾ ഉണ്ടെങ്കിൽ എന്ത് ചെയ്യണം?',
+     opts: ['പുതിയ കോപ്പി ടൈപ്പ് ചെയ്ത് ഡ്രാഫ്റ്റിന് കീഴിൽ വെക്കുക','അതേ ഡ്രാഫ്റ്റ് തന്നെ ഉപയോഗിക്കുക','ഡ്രാഫ്റ്റ് ഉപേക്ഷിക്കുക','റെക്കോർഡ് കീപ്പറിന് കൈമാറുക'],
+     answer: 'പുതിയ കോപ്പി ടൈപ്പ് ചെയ്ത് ഡ്രാഫ്റ്റിന് കീഴിൽ വെക്കുക'},
+    {q: 'സർക്കാർ/യൂണിവേഴ്സിറ്റി പോലുള്ള അധികാരികൾക്ക് എഴുതുന്ന ഫോം?',
+     opts: ['ലെറ്റർ ഫോം','മെമ്മോറാണ്ടം ഫോം','പ്രൊസീഡിംഗ്സ് ഫോം','എൻഡോഴ്സ്മെന്റ് ഫോം'],
+     answer: 'ലെറ്റർ ഫോം'},
+    {q: 'എൻഡോഴ്സ്മെന്റ് ഫോം എന്തിനാണ് ഉപയോഗിക്കുന്നത്?',
+     opts: ['സബ്‌ഓർഡിനേറ്റ് ഓഫീസറുടെ അഭിപ്രായ കുറിപ്പ്','പുറത്തേക്ക് കത്ത് അയയ്ക്കുക','ഡിസ്ട്രിബ്യൂഷൻ രജിസ്റ്റർ രേഖപ്പെടുത്തുക','തപാൽ തുറക്കുക'],
+     answer: 'സബ്‌ഓർഡിനേറ്റ് ഓഫീസറുടെ അഭിപ്രായ കുറിപ്പ്'},
+    {q: 'നോട്ട് ഫയലും കറന്റ് ഫയലും കൈകാര്യം ചെയ്യുന്ന രീതി?',
+     opts: ['തനിയെ കൈകാര്യം ചെയ്യണം','ഒന്നിച്ച് സ്റ്റാപിൾ ചെയ്യണം','ഒന്നിച്ച് നശിപ്പിക്കുക','ഒന്നാക്കി ചേർക്കുക'],
+     answer: 'തനിയെ കൈകാര്യം ചെയ്യണം'},
+    {q: 'നോട്ട് ഫയലിന്റെ ടൈറ്റിൽ എഴുതാൻ ഉപയോഗിക്കുന്ന മഷിയുടെ നിറം?',
+     opts: ['ചുവപ്പ് മഷി','നീല മഷി','കറുത്ത മഷി','പച്ച മഷി'],
+     answer: 'ചുവപ്പ് മഷി'},
+    {q: 'K ഡിസ്പോസൽ എന്താണ്?',
+     opts: ['മൂന്ന് വർഷം സൂക്ഷിച്ച് നശിപ്പിക്കുക','സ്ഥിരമായി സൂക്ഷിക്കുക','മറ്റൊരു ഓഫീസിൽ ലോഡ്ജ് ചെയ്യുക','ഒരു വർഷം സൂക്ഷിക്കുക'],
+     answer: 'മൂന്ന് വർഷം സൂക്ഷിച്ച് നശിപ്പിക്കുക'},
+    {q: 'തപാൽ തുറക്കേണ്ടത് എപ്പോഴാണ്?',
+     opts: ['ഓഫീസ് തലവന്റെ സാന്നിധ്യത്തിൽ','ഏതെങ്കിലും ക്ലാർക്ക് ഏത് സമയത്തും','മാസാവസാനം മാത്രം','റെക്കോർഡ് കീപ്പർ മാത്രം'],
+     answer: 'ഓഫീസ് തലവന്റെ സാന്നിധ്യത്തിൽ'},
+    {q: 'നമ്പറിങ്ങിന് ശേഷം ഡിസ്ട്രിബ്യൂഷൻ രജിസ്റ്ററിൽ എന്ത് രേഖപ്പെടുത്തണം?',
+     opts: ['സെക്ഷൻ അടിസ്ഥാനത്തിലുള്ള വിവരങ്ങൾ','യഥാർത്ഥ അയച്ചയാളുടെ പേര്','ഡിസ്പോസൽ തരം','ഒന്നും രേഖപ്പെടുത്തേണ്ടതില്ല'],
+     answer: 'സെക്ഷൻ അടിസ്ഥാനത്തിലുള്ള വിവരങ്ങൾ'},
+    {q: 'പേഴ്സണൽ രജിസ്റ്ററിന്റെ ഒരു പേജിൽ പരമാവധി എത്ര എൻട്രികൾ?',
+     opts: ['മൂന്ന് എൻട്രി','ഒന്ന് മാത്രം','പത്ത് എൻട്രി','അഞ്ച് എൻട്രി'],
+     answer: 'മൂന്ന് എൻട്രി'},
+    {q: 'N ഡിസ്പോസൽの場合 എന്ത് ചെയ്യണം?',
+     opts: ['ഓഫീസ് കോപ്പി സൂക്ഷിക്കാതെ ഒറിജിനൽ പുറത്തയക്കുക','സ്ഥിരമായി സൂക്ഷിക്കുക','ഉടൻ നശിപ്പിക്കുക','ഓഫീസിൽ ഫയൽ ചെയ്യുക'],
+     answer: 'ഓഫീസ് കോപ്പി സൂക്ഷിക്കാതെ ഒറിജിനൽ പുറത്തയക്കുക'}
+  ];
+
+  const form = document.getElementById('quizForm');
+  questions.forEach((item, idx) => {
+    const fs = document.createElement('fieldset');
+    fs.id = 'q'+(idx+1);
+    const legend = document.createElement('legend');
+    legend.textContent = `ചോദ്യം ${idx+1}: ${item.q}`;
+    fs.appendChild(legend);
+
+    const live = document.createElement('div');
+    live.id = `announce-${idx}`;
+    live.className = 'announce';
+    live.setAttribute('aria-live','polite');
+    fs.appendChild(live);
+
+    item.opts.forEach((opt, j) => {
+      const optId = `q${idx}_opt${j}`;
+      const wrapper = document.createElement('div');
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'q'+idx;
+      input.id = optId;
+      input.value = opt;
+      input.dataset.qidx = idx;
+      input.dataset.opttext = opt;
+      input.setAttribute('aria-describedby', `announce-${idx}`);
+
+      const label = document.createElement('label');
+      label.htmlFor = optId;
+      label.textContent = opt;
+
+      wrapper.appendChild(input);
+      wrapper.appendChild(label);
+      fs.appendChild(wrapper);
+
+      input.addEventListener('change', (e)=>{
+        const chosen = e.target.value;
+        const correct = item.answer;
+        const liveEl = document.getElementById('announce-'+idx);
+        if (chosen === correct) {
+          liveEl.textContent = 'ശരി — ' + correct + '.';
+          liveEl.className = 'announce correct';
+        } else {
+          liveEl.textContent = 'തെറ്റ് — ശരിയായ ഉത്തരം: ' + correct + '.';
+          liveEl.className = 'announce incorrect';
+        }
+      });
+    });
+
+    form.appendChild(fs);
+  });
+
+  function pickNegatives(n){
+    const set = new Set();
+    while(set.size < n){
+      const r = Math.floor(Math.random()*questions.length);
+      set.add(r);
+    }
+    return Array.from(set);
+  }
+  const negativeIndexes = pickNegatives(3);
+  negativeIndexes.forEach(i=>{
+    const el = document.getElementById('q'+(i+1));
+    if(el) el.classList.add('negative');
+  });
+  document.getElementById('negInfo').textContent = `ശ്രദ്ധിക്കുക: ചോദ്യങ്ങൾ ${negativeIndexes.map(i=>i+1).join(', ')} നെഗറ്റീവ് മാർക്ക് വഹിക്കുന്നവയാണ്. തെറ്റായ ഉത്തരത്തിന് ഓരോന്നിലും ഒരു മാർക്ക് കുറയും.`;
+
+  document.getElementById('submitBtn').addEventListener('click', ()=>{
+    const inputs = document.querySelectorAll('input[type=radio]:checked');
+    let score = 0;
+    const wrongNegatives = [];
+
+    inputs.forEach(inp=>{
+      const qidx = parseInt(inp.dataset.qidx,10);
+      const chosen = inp.value;
+      const correct = questions[qidx].answer;
+      if (chosen === correct) score += 1; else {
+        if (negativeIndexes.includes(qidx)) { score -= 1; wrongNegatives.push(qidx+1);} 
+      }
+    });
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = `<p><strong>അവസാന സ്കോർ:</strong> ${score} / ${questions.length}</p>`;
+    if(wrongNegatives.length>0){
+      resultDiv.innerHTML += `<p>നെഗറ്റീവ് മാർക്ക് ബാധിച്ചത്: ${wrongNegatives.join(', ')}.</p>`;
+    }
+
+    const answersList = document.getElementById('answersList');
+    answersList.innerHTML = '';
+    questions.forEach(qt=>{
+      const li = document.createElement('li');
+      li.textContent = qt.answer;
+      answersList.appendChild(li);
+    });
+    document.getElementById('allAnswers').hidden = false;
+    resultDiv.setAttribute('role','alert');
+    resultDiv.tabIndex = -1;
+    resultDiv.focus();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.querySelectorAll('input[type=radio]').forEach(i=>i.checked=false);
+    document.querySelectorAll('.announce').forEach(a=>{a.textContent='';a.className='announce';});
+    document.getElementById('result').innerHTML='';
+    document.getElementById('allAnswers').hidden = true;
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', ()=>{
+    const html = '<!doctype html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([html],{type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'MOP_Quiz_Malayalam.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+  </script>
+</body>
+</html>
